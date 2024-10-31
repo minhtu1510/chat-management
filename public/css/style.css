@@ -147,6 +147,8 @@ a{
 }
 .chat .inner-body {
   padding: 10px;
+  height: 450px;
+  overflow: auto;
 }
 .chat .inner-body .inner-name {
   font-weight: 600;
