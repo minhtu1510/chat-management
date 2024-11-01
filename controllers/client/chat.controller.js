@@ -5,6 +5,7 @@ module.exports.index = async (req, res) => {
   _io.once("connection", (socket) => {
     //Người dùng gửi tin nhắn lên server
     socket.on("CLIENT_SEND_MESSAGE", async (data) => {
+
       console.log(data);
       const dataChat = {
         userId: res.locals.user.id,
@@ -23,6 +24,13 @@ module.exports.index = async (req, res) => {
     });
     socket.on("disconnect", () => {
       console.log("Ngắt kết nối");
+    });
+    socket.on("CLIENT_SEND_TYPING", (type) => {
+      socket.broadcast.emit("SERVER_RETURN_TYPING", {
+        userId: res.locals.user.id,
+        fullName: res.locals.user.fullName,
+        type: type,
+      });
     });
   });
   //Lấy tin nhắn mặc định
