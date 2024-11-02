@@ -1,18 +1,36 @@
 import * as Popper from "https://cdn.jsdelivr.net/npm/@popperjs/core@^2/dist/esm/index.js";
 var socket = io();
 
+
+
 // CLIENT_SEND_MESSAGE
 const formChat = document.querySelector(".chat .inner-form");
 if (formChat) {
+  // Upload Images
+  const upload = new FileUploadWithPreview.FileUploadWithPreview(
+    "upload-images",
+    {
+      multiple: true,
+      maxFileCount: 6,
+    }
+  );
+
+  // End Upload Images
+
   formChat.addEventListener("submit", (event) => {
     event.preventDefault();
     const content = formChat.content.value;
-    if (content) {
+
+    const images = upload.cachedFileArray || [];
+
+    if (content || images.length > 0) {
       const data = {
         content: content,
+        images: images,
       };
       socket.emit("CLIENT_SEND_MESSAGE", data);
       formChat.content.value = "";
+      upload.resetPreviewPanel();
     }
   });
 }
@@ -31,9 +49,27 @@ socket.on("SERVER_RETURN_MESSAGE", (data) => {
     htmlfullName = `<div class="inner-name">${data.fullName}</div>`;
   }
 
+  let htmlContent = "";
+  if (data.content) {
+    htmlContent = `
+    <div class="inner-content">${data.content}</div>
+    `;
+  }
+  let htmlImages = "";
+  if (data.images.length > 0) {
+    htmlImages += `<div class="inner-images">`;
+    for (const image of data.images) {
+      htmlImages += `
+      <img src="${image}"/>
+    `;
+    }
+
+    htmlImages += `</div>`;
+  }
   div.innerHTML = `
     ${htmlfullName}
-    <div class="inner-content">${data.content}</div>
+    ${htmlContent}
+    ${htmlImages}
     `;
   const elementListTyping = document.querySelector(".chat .inner-list-typing");
   body.insertBefore(div, elementListTyping);
