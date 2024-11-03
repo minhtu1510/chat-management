@@ -7,7 +7,7 @@ module.exports.index = async (req, res) => {
   _io.once("connection", (socket) => {
     //Người dùng gửi tin nhắn lên server
     socket.on("CLIENT_SEND_MESSAGE", async (data) => {
-      const images = [];
+      const images = [];  
       for (const item of data.images) {
         const result = await streamUploadHelper.streamUpload(item);
         images.push(result.url);
