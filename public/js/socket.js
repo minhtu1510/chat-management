@@ -73,8 +73,10 @@ socket.on("SERVER_RETURN_MESSAGE", (data) => {
     `;
   const elementListTyping = document.querySelector(".chat .inner-list-typing");
   body.insertBefore(div, elementListTyping);
+
   socket.emit("CLIENT_SEND_TYPING", false);
   body.scrollTop = body.scrollHeight;
+  new Viewer(div);
 });
 // End SERVER_RETURN_MESSAGE\
 
@@ -82,6 +84,9 @@ socket.on("SERVER_RETURN_MESSAGE", (data) => {
 const bodyChat = document.querySelector(".chat .inner-body");
 if (bodyChat) {
   bodyChat.scrollTop = bodyChat.scrollHeight;
+  //ViewerJS
+  new Viewer(bodyChat);
+  //End ViewerJs
 }
 // End Scroll Chat To Bottom
 
@@ -140,3 +145,4 @@ socket.on("SERVER_RETURN_TYPING",(data)=>{
 })
 }
 //End SERVER_RETURN_TYPING
+

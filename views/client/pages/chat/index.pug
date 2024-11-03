@@ -18,10 +18,10 @@ block main
                                 if(chat.content)
                                     .inner-content
                                         | #{chat.content}
-                                //- if(chat.images)
-                                //-     .inner-images
-                                //-         each image in chat.images
-                                //-             img(src=image)
+                                if(chat.images)
+                                    .inner-images
+                                        each image in chat.images
+                                            img(src=image)
 
                         div(class="inner-list-typing")
                             //- div(class="box-typing")
