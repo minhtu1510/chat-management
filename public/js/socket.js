@@ -146,3 +146,16 @@ socket.on("SERVER_RETURN_TYPING",(data)=>{
 }
 //End SERVER_RETURN_TYPING
 
+//Chức năng gửi yêu cầu
+const listBtnAddfriend = document.querySelectorAll("[btn-add-friend]")
+if(listBtnAddfriend.length>0){
+  listBtnAddfriend.forEach(button=>{
+    button.addEventListener("click",()=>{
+      const userIdB = button.getAttribute("btn-add-friend")
+      button.closest(".box-user").classList.add("add")
+      socket.emit("CLIENT_ADD_FRIEND",userIdB)
+    })
+  })
+}
+//Hết chức năng gửi yêu cầu
+
