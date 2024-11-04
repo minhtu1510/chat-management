@@ -30,4 +30,6 @@ router.get("/profile", userMiddleware.requireAuth, controller.profile);
 
 router.get("/not-friend", userMiddleware.requireAuth, controller.notFriend);
 
+router.get("/request", userMiddleware.requireAuth, controller.request);
+
 module.exports = router;
