@@ -223,11 +223,15 @@ module.exports.notFriend = async (req, res) => {
       }
     });
   });
+  const friendsList = res.locals.user.friendsList;
+  const friendListId = friendsList.map((item) => item.userId);
+
   const users = await User.find({
     $and: [
       { _id: { $ne: userIdA } },
       { _id: { $nin: res.locals.user.requestFriends } },
       { _id: { $nin: res.locals.user.acceptFriends } },
+      { _id: { $nin: friendListId } },
     ],
     deleted: false,
     status: "active",
@@ -323,6 +327,55 @@ module.exports.accept = async (req, res) => {
         );
       }
     });
+    //Khi A chấp nhận kết bạn B
+    socket.on("CLIENT_ACCEPT_FRIEND", async (userIdB) => {
+      //Thêm {user_id,roomChatId} của A vào friendList của B
+      //Xóa id của B trong acceptFiends của A
+      const existBInA = await User.findOne({
+        _id: userIdA,
+        acceptFriends: userIdB,
+      });
+      if (existBInA) {
+        await User.updateOne(
+          {
+            _id: userIdA,
+          },
+          {
+            $pull: { acceptFriends: userIdB },
+            $push: {
+              friendsList: {
+                userId: userIdB,
+                roomChatId: "",
+              },
+            },
+          }
+        );
+      }
+
+      //Thêm {user_id,roomChatId} của B vào friendList của A
+
+      //Xóa id của A trong requestFiends của B
+      const existAInB = await User.findOne({
+        _id: userIdB,
+        requestFriends: userIdA,
+      });
+      if (existAInB) {
+        await User.updateOne(
+          {
+            _id: userIdB,
+          },
+          {
+            $pull: { requestFriends: userIdA },
+            $push: {
+              friendsList: {
+                userId: userIdA,
+                roomChatId: "",
+              },
+            },
+          }
+        );
+      }
+    });
   });
 
   const users = await User.find({
@@ -335,3 +388,20 @@ module.exports.accept = async (req, res) => {
     users: users,
   });
 };
+
+module.exports.friends = async (req, res) => {
+  // const userIdA = res.locals.user.id;
+  const friendsList = res.locals.user.friendsList;
+  const friendListId = friendsList.map((item) => item.userId);
+  const users = await User.find({
+    _id: { $in: friendListId },
+    deleted: false,
+    status: "active",
+  });
+  res.render("client/pages/user/friends", {
+    pageTitle: "Danh sách bạn bè",
+    users: users,
+  });
+};
+
+
