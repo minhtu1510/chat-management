@@ -32,4 +32,6 @@ router.get("/not-friend", userMiddleware.requireAuth, controller.notFriend);
 
 router.get("/request", userMiddleware.requireAuth, controller.request);
 
+router.get("/accept", userMiddleware.requireAuth, controller.accept);
+
 module.exports = router;
