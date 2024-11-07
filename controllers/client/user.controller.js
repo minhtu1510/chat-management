@@ -287,6 +287,16 @@ module.exports.request = async (req, res) => {
           }
         );
       }
+      //Trả về cho B số lượng user cần chấp nhận mới nhất
+      const userB = await User.findOne({
+        _id: userIdB,
+        deleted: false,
+        status: "active",
+      });
+      _io.emit("SERVER_RETURN_LENGTH_ACCEPT_FRIENDS", {
+        userIdB: userIdB,
+        length: userB.acceptFriends.length,
+      });
     });
   });
 
