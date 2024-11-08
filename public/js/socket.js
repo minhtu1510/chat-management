@@ -211,12 +211,15 @@ socket.on("SERVER_RETURN_LENGTH_ACCEPT_FRIENDS",(data)=>{
 
 // SERVER_RETURN_INFO_ACCECPT_FRIENDS
 socket.on("SERVER_RETURN_INFO_ACCECPT_FRIENDS",(data)=>{
-  const listAcceptFriends = document.querySelector(`[list-accept-friends="${data.userIdB}"]`)
-  if(listAcceptFriends){
-    const newUser = document.createElement("div")
-    newUser.classList.add("col-6")
+  //Thêm A vào danh sách lời mời đã nhận
+  const listAcceptFriends = document.querySelector(
+    `[list-accept-friends="${data.userIdB}"]`
+  );
+  if (listAcceptFriends) {
+    const newUser = document.createElement("div");
+    newUser.classList.add("col-6");
     newUser.setAttribute("user-id", data.userIdA);
-    newUser.innerHTML=`
+    newUser.innerHTML = `
     <div class="box-user">
         <div class="inner-avatar">
           <img src="https://robohash.org/hicveldicta.png" alt="${data.fullNameA}" />
@@ -253,20 +256,31 @@ socket.on("SERVER_RETURN_INFO_ACCECPT_FRIENDS",(data)=>{
           </div>
         </div>
       </div>
-    `
-    listAcceptFriends.appendChild(newUser)
-     // Chấp nhận kết bạn
-     const btnAcceptFriend = newUser.querySelector("[btn-accept-friend]");
-     btnAcceptFriend.addEventListener("click", () => {
-       btnAcceptFriend.closest(".box-user").classList.add("accepted");
-       socket.emit("CLIENT_ACCEPT_FRIEND", data.userIdA);
-     })
-     // Không chấp nhận kết bạn
-     const btnRefuseFriend = newUser.querySelector("[btn-refuse-friend]");
-     btnRefuseFriend.addEventListener("click", () => {
-       btnRefuseFriend.closest(".box-user").classList.add("refuse");
-       socket.emit("CLIENT_REFUSE_FRIEND", data.userIdA);
-     }) 
+    `;
+    listAcceptFriends.appendChild(newUser);
+    // Chấp nhận kết bạn
+    const btnAcceptFriend = newUser.querySelector("[btn-accept-friend]");
+    btnAcceptFriend.addEventListener("click", () => {
+      btnAcceptFriend.closest(".box-user").classList.add("accepted");
+      socket.emit("CLIENT_ACCEPT_FRIEND", data.userIdA);
+    });
+    // Không chấp nhận kết bạn
+    const btnRefuseFriend = newUser.querySelector("[btn-refuse-friend]");
+    btnRefuseFriend.addEventListener("click", () => {
+      btnRefuseFriend.closest(".box-user").classList.add("refuse");
+      socket.emit("CLIENT_REFUSE_FRIEND", data.userIdA);
+    });
+  }
+
+  //Xóa A khỏi danh sách người dùng của B
+  const listNotFriend = document.querySelector(
+    `[list-not-friends="${data.userIdB}"]`
+  );
+  if (listNotFriend) {
+    const userA = listNotFriend.querySelector(`[user-id="${data.userIdA}"]`);
+    if (userA) {
+      listNotFriend.removeChild(userA);
+    }
   }
 })
 // End SERVER_RETURN_INFO_ACCECPT_FRIENDS
