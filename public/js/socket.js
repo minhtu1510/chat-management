@@ -215,6 +215,7 @@ socket.on("SERVER_RETURN_INFO_ACCECPT_FRIENDS",(data)=>{
   if(listAcceptFriends){
     const newUser = document.createElement("div")
     newUser.classList.add("col-6")
+    newUser.setAttribute("user-id", data.userIdA);
     newUser.innerHTML=`
     <div class="box-user">
         <div class="inner-avatar">
@@ -269,3 +270,17 @@ socket.on("SERVER_RETURN_INFO_ACCECPT_FRIENDS",(data)=>{
   }
 })
 // End SERVER_RETURN_INFO_ACCECPT_FRIENDS
+
+// SERVER_RETURN_USER_ID_CANCEL_FRIEND
+socket.on("SERVER_RETURN_USER_ID_CANCEL_FRIEND",(data)=>{
+  // userIdB để tìm vào danh sách của B
+  // userIdA để xóa khỏi giao diện của B
+  const listAcceptFriends = document.querySelector(`[list-accept-friends="${data.userIdB}"]`)
+  if(listAcceptFriends){
+    const userA = listAcceptFriends.querySelector(`[user-id="${data.userIdA}"]`)
+    if(userA){
+      listAcceptFriends.removeChild(userA)
+    }
+  }
+})
+// End SERVER_RETURN_USER_ID_CANCEL_FRIEND

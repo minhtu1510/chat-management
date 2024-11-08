@@ -96,6 +96,11 @@ module.exports = (req, res) => {
         userIdB: userIdB,
         length: userB.acceptFriends.length,
       });
+      //Trả về cho B userId của A để xóa khỏi giao diện
+      _io.emit("SERVER_RETURN_USER_ID_CANCEL_FRIEND", {
+        userIdB: userIdB,
+        userIdA: userIdA,
+      });
     });
 
     //Khi A từ chối kết bạn
