@@ -6,6 +6,7 @@ const forgotPassword = require("../../models/forgot-password.model");
 const sendMailHelper = require("../../helpers/sendMail.helper");
 
 const userSocket = require("../../sockets/client/user.socket");
+const roomChat = require("../../models/rooms-chat.model");
 
 module.exports.register = async (req, res) => {
   res.render("client/pages/user/register", {
@@ -271,12 +272,23 @@ module.exports.accept = async (req, res) => {
 module.exports.friends = async (req, res) => {
   // const userIdA = res.locals.user.id;
   const friendsList = res.locals.user.friendsList;
-  const friendListId = friendsList.map((item) => item.userId);
-  const users = await User.find({
-    _id: { $in: friendListId },
-    deleted: false,
-    status: "active",
-  }).select("id fullName avatar statusOnline");
+  // const friendListId = friendsList.map((item) => item.userId);
+  const users = [];
+
+  for (const user of friendsList) {
+    const infoUser = await User.findOne({
+      _id: user.userId,
+      deleted: false,
+      status: "active",
+    });
+    users.push({
+      id: infoUser.id,
+      fullName: infoUser.fullName,
+      avatar: infoUser.avatar,
+      statusOnline: infoUser.statusOnline,
+      roomChatId: user.roomChatId,
+    });
+  }
   res.render("client/pages/user/friends", {
     pageTitle: "Danh sách bạn bè",
     users: users,
