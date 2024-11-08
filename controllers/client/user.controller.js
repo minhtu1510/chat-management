@@ -83,6 +83,14 @@ module.exports.loginPost = async (req, res) => {
       statusOnline: "online",
     }
   );
+
+  _io.once("connection", (socket) => {
+    _io.emit("SERVER_RETURN_STATUS_ONLINE_USER", {
+      userId: existUser.id,
+      statusOnline: "online",
+    });
+  });
+
   req.flash("success", "Đăng nhập thành công !");
   res.redirect("/");
 };
@@ -96,6 +104,12 @@ module.exports.logout = async (req, res) => {
       statusOnline: "offline",
     }
   );
+  _io.once("connection", (socket) => {
+    _io.emit("SERVER_RETURN_STATUS_ONLINE_USER", {
+      userId: res.locals.user.id,
+      statusOnline: "offline",
+    });
+  });
   res.clearCookie("tokenUser");
   req.flash("success", "Đã đăng xuất !");
   res.redirect("/");
