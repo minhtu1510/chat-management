@@ -36,4 +36,6 @@ router.get("/accept", userMiddleware.requireAuth, controller.accept);
 
 router.get("/friends", userMiddleware.requireAuth, controller.friends);
 
+router.get("/rooms", userMiddleware.requireAuth, controller.rooms);
+
 module.exports = router;
