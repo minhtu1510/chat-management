@@ -5,9 +5,10 @@ const streamUploadHelper = require("../../helpers/streamUpload.helper");
 
 module.exports.index = async (req, res) => {
   _io.once("connection", (socket) => {
+    socket.join(req.params.roomChatId);
     //Người dùng gửi tin nhắn lên server
     socket.on("CLIENT_SEND_MESSAGE", async (data) => {
-      const images = [];  
+      const images = [];
       for (const item of data.images) {
         const result = await streamUploadHelper.streamUpload(item);
         images.push(result.url);
@@ -17,12 +18,13 @@ module.exports.index = async (req, res) => {
         userId: res.locals.user.id,
         content: data.content,
         images: images,
+        roomChatId: req.params.roomChatId,
       };
       //Lưu tin nhắn vào database
       const chat = new Chat(dataChat);
       await chat.save();
       //Trả data về cho client
-      _io.emit("SERVER_RETURN_MESSAGE", {
+      _io.to(req.params.roomChatId).emit("SERVER_RETURN_MESSAGE", {
         userId: res.locals.user.id,
         fullName: res.locals.user.fullName,
         content: data.content,
@@ -33,7 +35,7 @@ module.exports.index = async (req, res) => {
       console.log("Ngắt kết nối");
     });
     socket.on("CLIENT_SEND_TYPING", (type) => {
-      socket.broadcast.emit("SERVER_RETURN_TYPING", {
+      socket.broadcast.to(req.params.roomChatId).emit("SERVER_RETURN_TYPING", {
         userId: res.locals.user.id,
         fullName: res.locals.user.fullName,
         type: type,
@@ -43,6 +45,7 @@ module.exports.index = async (req, res) => {
   //Lấy tin nhắn mặc định
   const chats = await Chat.find({
     deleted: false,
+    roomChatId: req.params.roomChatId,
   });
   for (const chat of chats) {
     const infoUser = await User.findOne({
