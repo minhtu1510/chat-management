@@ -6,7 +6,8 @@ const forgotPassword = require("../../models/forgot-password.model");
 const sendMailHelper = require("../../helpers/sendMail.helper");
 
 const userSocket = require("../../sockets/client/user.socket");
-const roomChat = require("../../models/rooms-chat.model");
+const RoomChat = require("../../models/rooms-chat.model");
+const { infoUser } = require("../../middlewares/client/user.middleware");
 
 module.exports.register = async (req, res) => {
   res.render("client/pages/user/register", {
@@ -300,6 +301,52 @@ module.exports.rooms = async (req, res) => {
     pageTitle: "Phòng chat",
   });
 };
+
+module.exports.createRoom = async (req, res) => {
+  const friendsList = res.locals.user.friendsList;
+  const friendsListFinal = [];
+  for (const item of friendsList) {
+    const infoFriend = await User.findOne({
+      _id: item.userId,
+      deleted: false,
+    });
+    if (infoFriend) {
+      friendsListFinal.push({
+        userId: item.userId,
+        fullName: infoFriend.fullName,
+      });
+    }
+  }
+  res.render("client/pages/user/create-room", {
+    pageTitle: "Tạo phòng chat",
+    friendsList: friendsListFinal,
+  });
+};
+
+module.exports.createRoomPost = async (req, res) => {
+  const title = req.body.title;
+  const usersId = req.body.usersId;
+
+  const dataRoom = {
+    title: title,
+    typeRoom: "group",
+    users: [],
+  };
+  dataRoom.users.push({
+    userId: res.locals.user.id,
+    role: "superAdmin",
+  });
+  for (const item of usersId) {
+    dataRoom.users.push({
+      userId: item,
+      role: "user",
+    });
+  }
+  const newRoom = new RoomChat(dataRoom);
+  await newRoom.save();
+  res.redirect(`/chat/${newRoom.id}`);
+};
+
 
 
 
